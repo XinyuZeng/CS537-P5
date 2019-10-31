@@ -89,3 +89,16 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_dump_physmem(void)
+{
+    char *frames;
+    char *pids;
+    int numframes;
+
+    if(argptr(0, &frames, sizeof(int *)) < 0 || argptr(1, &pids, sizeof(int *)) < 0
+        || argint(2, &numframes) < 0)
+        return -1;
+    return dump_physmem((int *)frames, (int *)pids, numframes);
+}

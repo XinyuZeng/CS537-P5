@@ -119,6 +119,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             dump_physmem(int*, int*, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
