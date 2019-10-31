@@ -55,7 +55,3 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
-
-int frames[16384];
-int pids[16384];
-int numframes;

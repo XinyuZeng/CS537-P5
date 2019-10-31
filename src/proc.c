@@ -7,8 +7,6 @@
 #include "proc.h"
 #include "spinlock.h"
 
-#define NULL 0
-
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -530,14 +528,3 @@ procdump(void)
   }
 }
 
-// This system call is used to find which process owns each frame of physical memory.
-int
-dump_physmem(int *_frames, int *_pids, int _numframes)
-{
-    if (numframes < 0) {
-        return -1;
-    }
-    _frames = frames;
-    _pids = pids;
-    return 0;
-}

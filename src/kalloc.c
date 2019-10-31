@@ -13,6 +13,12 @@ void freerange(void *vstart, void *vend);
 extern char end[]; // first address after kernel loaded from ELF file
                    // defined by the kernel linker script in kernel.ld
 
+struct track {
+    int frames[16384];
+    int pids[16384];
+    int index;
+}track;
+
 struct run {
   struct run *next;
 };
@@ -41,6 +47,9 @@ kinit2(void *vstart, void *vend)
 {
   freerange(vstart, vend);
   kmem.use_lock = 1;
+    memset(track.frames, -1, 16384 * sizeof(int));
+    memset(track.pids, -1, 16384 * sizeof(int));
+    track.index = 0;
 }
 
 void
@@ -90,6 +99,21 @@ kalloc(void)
     kmem.freelist = r->next;
   if(kmem.use_lock)
     release(&kmem.lock);
+  track.frames[track.index++] = V2P(r) >> 12;
   return (char*)r;
 }
 
+// This system call is used to find which process owns each frame of physical memory.
+int
+dump_physmem(int *_frames, int *_pids, int _numframes)
+{
+    if (_numframes < 0) {
+        return -1;
+    }
+
+    for (int i = 0; i < _numframes; ++i) {
+        _frames[i] = track.frames[i];
+        _pids[i] = track.pids[i];
+    }
+    return 0;
+}
