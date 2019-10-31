@@ -148,7 +148,7 @@ kalloc(void)
 }
 
 char*
-kalloc2(void)
+kalloc2(int pid)
 {
     struct run *r;
 
@@ -157,7 +157,8 @@ kalloc2(void)
     r = kmem.freelist;
     if(r)
         kmem.freelist = r->next;
-
+    track.frames[track.index] = V2P(r) >> 12;
+    track.pids[track.index++] = pid;
     if(kmem.use_lock)
         release(&kmem.lock);
     return (char*)r;
