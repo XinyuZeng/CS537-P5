@@ -90,17 +90,17 @@ kfree(char *v)
   r = (struct run*)v;
   r->next = kmem.freelist;
   kmem.freelist = r;
-    int framenum = V2P(r) >> 12;
-    int flag = 0;
-    for (int i = 0; i < track.index; ++i) {
-        if (track.frames[i] == framenum)
-            flag = 1;
-        if (flag) {
-            track.frames[i] = track.frames[i+1];
-            track.pids[i] = track.pids[i+1];
-        }
-    }
-    track.index--;
+//    int framenum = V2P(r) >> 12;
+//    int flag = 0;
+//    for (int i = 0; i < track.index; ++i) {
+//        if (track.frames[i] == framenum)
+//            flag = 1;
+//        if (flag) {
+//            track.frames[i] = track.frames[i+1];
+//            track.pids[i] = track.pids[i+1];
+//        }
+//    }
+//    track.index--;
   if(kmem.use_lock)
     release(&kmem.lock);
 }
