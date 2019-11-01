@@ -9,14 +9,16 @@
 #include "mmu.h"
 #include "spinlock.h"
 
+#define LENGTH 32768
+
 void freerange(void *vstart, void *vend);
 void freerange2(void *vstart, void *vend);
 extern char end[]; // first address after kernel loaded from ELF file
                    // defined by the kernel linker script in kernel.ld
 
 struct track {
-    int frames[16385];
-    int pids[16385];
+    int frames[LENGTH];
+    int pids[LENGTH];
     int index;
 }track;
 
@@ -48,8 +50,8 @@ kinit2(void *vstart, void *vend)
 {
   freerange2(vstart, vend);
   kmem.use_lock = 1;
-    memset(track.frames, -1, 16384 * sizeof(int));
-    memset(track.pids, -1, 16384 * sizeof(int));
+    memset(track.frames, -1, LENGTH * sizeof(int));
+    memset(track.pids, -1, LENGTH * sizeof(int));
     track.index = 0;
 }
 
@@ -136,11 +138,12 @@ kalloc(void)
   if(kmem.use_lock)
     acquire(&kmem.lock);
   r = kmem.freelist;
-  if(r)
-    kmem.freelist = r->next;
+  if(r) {
+      kmem.freelist = r->next;
 
-  track.frames[track.index] = V2P(r) >> 12;
-  track.pids[track.index++] = -2;
+      track.frames[track.index] = V2P(r) >> 12;
+      track.pids[track.index++] = -2;
+  }
 
   if(kmem.use_lock)
     release(&kmem.lock);
@@ -155,10 +158,11 @@ kalloc2(int pid)
     if(kmem.use_lock)
         acquire(&kmem.lock);
     r = kmem.freelist;
-    if(r)
+    if(r) {
         kmem.freelist = r->next;
-    track.frames[track.index] = V2P(r) >> 12;
-    track.pids[track.index++] = pid;
+        track.frames[track.index] = V2P(r) >> 12;
+        track.pids[track.index++] = pid;
+    }
     if(kmem.use_lock)
         release(&kmem.lock);
     return (char*)r;
