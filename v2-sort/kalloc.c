@@ -222,83 +222,62 @@ kalloc2(int pid)
     return (char*)r;
 }
 
-void merge(int arr[], int arr2[], int l, int m, int r)
-{
+void merge(int frames[], int pids[], int lo, int mid, int hi) {
     int i, j, k;
-    int n1 = m - l + 1;
-    int n2 =  r - m;
+    int n1 = mid - lo + 1;
+    int n2 = hi - mid;
 
-    /* create temp arrays */
-    int L[n1], R[n2];
+    int L1[n1], R1[n2];
     int L2[n1], R2[n2];
 
-    /* Copy data to temp arrays L[] and R[] */
     for (i = 0; i < n1; i++) {
-        L[i] = arr[l + i];
-        L2[i] = arr2[l + i];
+        L1[i] = frames[lo + i];
+        L2[i] = pids[lo + i];
     }
     for (j = 0; j < n2; j++) {
-        R[j] = arr[m + 1 + j];
-        R2[j] = arr2[m + 1 + j];
+        R1[j] = frames[mid + 1 + j];
+        R2[j] = pids[mid + 1 + j];
     }
 
-    /* Merge the temp arrays back into arr[l..r]*/
-    i = 0; // Initial index of first subarray
-    j = 0; // Initial index of second subarray
-    k = l; // Initial index of merged subarray
-    while (i < n1 && j < n2)
-    {
-        if (L[i] >= R[j])
-        {
-            arr[k] = L[i];
-            arr2[k] = L2[i];
+    i = 0;
+    j = 0;
+    k = lo;
+    while (i < n1 && j < n2) {
+        if (L1[i] >= R1[j]) {
+            frames[k] = L1[i];
+            pids[k] = L2[i];
             i++;
-        }
-        else
-        {
-            arr[k] = R[j];
-            arr2[k] = R2[j];
+        } else {
+            frames[k] = R1[j];
+            pids[k] = R2[j];
             j++;
         }
         k++;
     }
 
-    /* Copy the remaining elements of L[], if there
-       are any */
-    while (i < n1)
-    {
-        arr[k] = L[i];
-        arr2[k] = L2[i];
+    while (i < n1) {
+        frames[k] = L1[i];
+        pids[k] = L2[i];
         i++;
         k++;
     }
 
-    /* Copy the remaining elements of R[], if there
-       are any */
-    while (j < n2)
-    {
-        arr[k] = R[j];
-        arr2[k] = R2[j];
+    while (j < n2) {
+        frames[k] = R1[j];
+        pids[k] = R2[j];
         j++;
         k++;
     }
 }
 
-/* l is for left index and r is right index of the
-   sub-array of arr to be sorted */
-void mergeSort(int arr[], int arr2[], int l, int r)
-{
-    if (l < r)
-    {
-        // Same as (l+r)/2, but avoids overflow for
-        // large l and h
-        int m = l+(r-l)/2;
+void mergeSort(int frames[], int pids[], int lo, int hi) {
+    if (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
 
-        // Sort first and second halves
-        mergeSort(arr, arr2, l, m);
-        mergeSort(arr, arr2, m+1, r);
+        mergeSort(frames, pids, lo, mid);
+        mergeSort(frames, pids, mid + 1, hi);
 
-        merge(arr, arr2, l, m, r);
+        merge(frames, pids, lo, mid, hi);
     }
 }
 
